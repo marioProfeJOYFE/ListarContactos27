@@ -5,7 +5,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.mrh.listarcontactos.Contacto
 import kotlinx.serialization.Serializable
+import java.math.BigInteger
 
 
 @Serializable
@@ -34,7 +36,18 @@ fun AppNavigation() {
 
         composable<DetalleContactoDestination>{ rutaNavegacion ->
             val contacto = rutaNavegacion.toRoute<DetalleContactoDestination>()
-
+            val contactoReal = Contacto(
+                nombre = contacto.nombre,
+                apellido = contacto.apellido,
+                mail = contacto.mail,
+                telefono = BigInteger(contacto.telefono)
+            )
+            ContactoDetailScreen(
+                contacto = contactoReal,
+                //Volver a la pantalla anterior
+                onBackClick = {
+                    navController.popBackStack()
+            })
         }
 
     }
