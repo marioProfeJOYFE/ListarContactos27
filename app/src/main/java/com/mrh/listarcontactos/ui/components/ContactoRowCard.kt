@@ -1,7 +1,7 @@
 package com.mrh.listarcontactos.ui.components
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -20,7 +20,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mrh.listarcontactos.Contacto
@@ -44,24 +43,19 @@ fun ContactoRowCard(contacto: Contacto, onClick : () -> Unit) {
                     contentScale = ContentScale.FillBounds
                 )
             }else{
-                Card(
-                    modifier = Modifier.padding(start = 20.dp).size(50.dp, 50.dp).clip(CircleShape),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.tertiary,
-                        contentColor = MaterialTheme.colorScheme.onTertiary
-                    )
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier.padding(start = 20.dp)
                 ){
-                    Column(
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        Text(
-                            text = contacto.nombre[0].toString(),
-                            modifier = Modifier.fillMaxWidth(),
-                            textAlign = TextAlign.Center,
-                            fontSize = 24.sp
+                    Card(
+                        modifier = Modifier.size(50.dp).clip(CircleShape),
+                        colors = CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.secondaryContainer
                         )
-                    }
+                    ) {
 
+                    }
+                    Text(contacto.nombre[0].toString(), fontSize = 20.sp)
                 }
             }
             Text(

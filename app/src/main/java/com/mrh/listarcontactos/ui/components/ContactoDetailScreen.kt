@@ -1,5 +1,8 @@
 package com.mrh.listarcontactos.ui.components
 
+import android.content.Intent
+import android.net.Uri
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -31,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -40,6 +44,8 @@ import com.mrh.listarcontactos.Contacto
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ContactoDetailScreen(contacto: Contacto, onBackClick: () -> Unit){
+
+    val context = LocalContext.current
 
     Scaffold(
         topBar = {
@@ -91,7 +97,19 @@ fun ContactoDetailScreen(contacto: Contacto, onBackClick: () -> Unit){
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Card(
-                        modifier = Modifier.size(60.dp).clip(CircleShape)
+                        modifier = Modifier.size(60.dp).clip(CircleShape),
+                        onClick = {
+                            // Declaramos una ruta con la informacion del numero de telefono
+                            val u = Uri.parse("tel:" + contacto.telefono.toString())
+                            // Creamos el intent y seteamos el telefono
+                            val i = Intent(Intent.ACTION_DIAL, u)
+                            try{
+                                context.startActivity(i)
+                            }catch (s: SecurityException){
+                                Toast.makeText(context, "Ha ocurrido un error",
+                                    Toast.LENGTH_LONG).show()
+                            }
+                        }
                     ) {
                         Box(
                             contentAlignment = Alignment.Center,
@@ -103,7 +121,7 @@ fun ContactoDetailScreen(contacto: Contacto, onBackClick: () -> Unit){
                             )
                         }
                     }
-                    Text("Llamar", textAlign = TextAlign.Center)
+                    Text("Llamar", textAlign = TextAlign.Center, fontSize = 12.sp)
                 }
 
                 Column(
@@ -122,7 +140,7 @@ fun ContactoDetailScreen(contacto: Contacto, onBackClick: () -> Unit){
                             )
                         }
                     }
-                    Text("Mail", textAlign = TextAlign.Center)
+                    Text("Mail", textAlign = TextAlign.Center, fontSize = 12.sp)
                 }
 
                 Column(
@@ -141,7 +159,7 @@ fun ContactoDetailScreen(contacto: Contacto, onBackClick: () -> Unit){
                             )
                         }
                     }
-                    Text("Compartir", textAlign = TextAlign.Center)
+                    Text("Compartir", textAlign = TextAlign.Center, fontSize = 12.sp)
                 }
 
             }
