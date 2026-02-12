@@ -2,8 +2,10 @@ package com.mrh.listarcontactos.ui.components
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -20,6 +22,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.mrh.listarcontactos.Contacto
@@ -28,11 +31,11 @@ import com.mrh.listarcontactos.Contacto
 @Composable
 fun ContactoRowCard(contacto: Contacto, onClick : () -> Unit) {
     Card(
-        modifier = Modifier.fillMaxWidth().height(60.dp),
+        modifier = Modifier.fillMaxWidth().height(80.dp),
         onClick = onClick
     ){
         Row(
-            modifier = Modifier.fillMaxWidth().fillMaxHeight(),
+            modifier = Modifier.padding(vertical = 15.dp).fillMaxWidth().fillMaxHeight(),
             verticalAlignment = Alignment.CenterVertically
         ){
             if(contacto.imagenId != null){
@@ -43,19 +46,26 @@ fun ContactoRowCard(contacto: Contacto, onClick : () -> Unit) {
                     contentScale = ContentScale.FillBounds
                 )
             }else{
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier.padding(start = 20.dp)
-                ){
-                    Card(
-                        modifier = Modifier.size(50.dp).clip(CircleShape),
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.secondaryContainer
-                        )
+                Card(
+                    modifier = Modifier
+                        .padding(start = 20.dp)
+                        .size(50.dp) // Al ser un círculo, basta con un valor para que sea proporcional
+                        .clip(CircleShape),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.tertiary,
+                        contentColor = MaterialTheme.colorScheme.onTertiary
+                    )
+                ) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(), // Ocupa todo el espacio del Card
+                        contentAlignment = Alignment.Center // Centra el contenido en ambos ejes
                     ) {
-
+                        Text(
+                            text = contacto.nombre[0].uppercase(), // uppercase() para que siempre se vea bien
+                            fontSize = 24.sp,
+                            textAlign = TextAlign.Center
+                        )
                     }
-                    Text(contacto.nombre[0].toString(), fontSize = 20.sp)
                 }
             }
             Text(

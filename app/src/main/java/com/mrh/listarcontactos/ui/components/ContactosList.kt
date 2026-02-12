@@ -8,14 +8,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -28,141 +27,96 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import com.mrh.listarcontactos.Contacto
-import com.mrh.listarcontactos.R
 import java.math.BigInteger
 
 
 @Composable
-fun MainView(navController: NavController) {
-
-    var inputNombre by remember { mutableStateOf("") }
-
-    var showDialog by remember { mutableStateOf(false) }
-
-    val listaContactos = remember {
-        mutableStateListOf(
-            Contacto(
-                nombre = "VINI",
-                apellido = "Rios",
-                mail = "mario.rios@iepgroup.es",
-                telefono = BigInteger("1234567"),
-                imagenId = R.drawable.vini
-            ),
-            Contacto(
-                nombre = "Pepe",
-                apellido = "Rios",
-                mail = "mario.rios@iepgroup.es",
-                telefono = BigInteger("1234567"),
-
-                )
+fun MainView(modifier: Modifier = Modifier, navController: NavController? = null) {
+    // 1. Lista de contactos inicial (puedes añadir algunos de prueba)
+    val contactos = remember {
+        mutableStateListOf<Contacto>(
+            Contacto("Marta","Pepe" , "marta@mail.com", BigInteger("600000000")),
+            Contacto("Juan", "Pepe", "juan@mail.com", BigInteger("600000000"))
         )
     }
+
+    var showDialog by remember { mutableStateOf(false) }
 
     Scaffold(
         floatingActionButton = {
             FloatingActionButton(
-                onClick = {
-                    showDialog = true
-                }
+                onClick = { showDialog = true } // 2. Abrir el diálogo
             ) {
                 Icon(
-                    imageVector = Icons.Filled.Add,
-                    contentDescription = null
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Añadir contacto"
                 )
             }
         }
     ) { innerPadding ->
         Column(
-            Modifier
+            modifier = modifier
                 .padding(innerPadding)
+                .padding(10.dp)
                 .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-
-            TextField(
-                value = inputNombre,
-                onValueChange = { textoTeclado ->
-                    inputNombre = textoTeclado
-                },
-                label = {
-                    Text("Buscar...")
-                },
-                modifier = Modifier.padding(20.dp),
-                leadingIcon = {
-                    Icon(
-                        imageVector = Icons.Filled.Search,
-                        contentDescription = null
-                    )
-                }
-            )
-
-            ContactosList(
-                contactos = listaContactos.filter { contacto ->
-                    contacto.nombre.uppercase().contains(inputNombre.uppercase())
-                },
-                navController = navController
-            )
+            ContactosList(contactos = contactos, navController = navController)
         }
 
         if (showDialog) {
             AddContactoDialog(
-                onDismiss = {
-                    showDialog = false
-                },
-                onConfirm = { contacto ->
-                    listaContactos.add(contacto)
-                    showDialog = false
+                onDismiss = { showDialog = false },
+                onConfirm = { nuevoNombre, nuevoTelefono ->
+                    // 3. Crear el objeto y añadirlo a la lista
+                    val nuevoContacto = Contacto(
+                        nombre = nuevoNombre,
+                        apellido = "Pepe",
+                        telefono = BigInteger(nuevoTelefono),
+                        mail = "${nuevoNombre.lowercase()}@mail.com",
+                        imagenId = null // Por defecto sin foto
+                    )
+                    contactos.add(nuevoContacto)
+                    showDialog = false // Cerrar tras añadir
                 }
             )
         }
-
     }
-
 }
-
 @Composable
 fun ContactosList(
     contactos: List<Contacto>,
     modifier: Modifier = Modifier,
-    navController: NavController
-) {
+    navController: NavController?
+){
     LazyColumn(
         modifier = modifier.padding(horizontal = 10.dp),
     ) {
 
-        items(contactos) { contacto ->
-            ContactoRowCard(contacto = contacto, onClick = {
-                navController.navigate(
-                    DetalleContactoDestination(
-                        nombre = contacto.nombre,
-                        apellido = contacto.apellido,
-                        telefono = contacto.telefono.toString(),
-                        mail = contacto.mail
-                    )
-                )
+        items(contactos){  contacto ->
+            ContactoRowCard(contacto=contacto, onClick = {
+                navController?.navigate(DetalleContactoDestino(contacto.nombre, contacto.telefono.toString(), contacto.mail))
             })
             Spacer(modifier = Modifier.padding(top = 10.dp))
         }
     }
 }
-
-
 @Composable
-fun AddContactoDialog(onDismiss: () -> Unit, onConfirm: (Contacto) -> Unit) {
-    var nombreText by remember { mutableStateOf("") }
-    var apellidoText by remember { mutableStateOf("") }
-    var mailText by remember { mutableStateOf("") }
-    var telefonoText by remember { mutableStateOf("") }
+fun AddContactoDialog(
+    onDismiss: () -> Unit,
+    onConfirm: (String, String) -> Unit // Pasamos los datos al confirmar
+) {
+    var nombre by remember { mutableStateOf("") }
+    var telefono by remember { mutableStateOf("") }
 
-    Dialog(
-        onDismissRequest = onDismiss
-    ) {
+    Dialog(onDismissRequest = onDismiss) {
+        // Usamos un Card o Surface para que el diálogo tenga forma y color
         Card(
+            shape = androidx.compose.foundation.shape.RoundedCornerShape(16.dp),
             modifier = Modifier.padding(16.dp)
         ) {
             Column(
@@ -171,76 +125,54 @@ fun AddContactoDialog(onDismiss: () -> Unit, onConfirm: (Contacto) -> Unit) {
                     .fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                OutlinedTextField(
-                    value = nombreText,
-                    onValueChange = { texto ->
-                        nombreText = texto
-                    },
-                    label = {
-                        Text("Nombre")
-                    }
+                Text(
+                    text = "Nuevo Contacto",
+                    style = MaterialTheme.typography.headlineSmall,
+                    modifier = Modifier.padding(bottom = 16.dp)
                 )
-                Spacer(modifier = Modifier.padding(8.dp))
-                OutlinedTextField(
-                    value = apellidoText,
-                    onValueChange = { texto ->
-                        apellidoText = texto
-                    },
-                    label = {
-                        Text("Apellido")
-                    }
+
+                TextField(
+                    value = nombre,
+                    onValueChange = { nombre = it },
+                    label = { Text("Nombre") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
                 )
+
                 Spacer(modifier = Modifier.padding(8.dp))
-                OutlinedTextField(
-                    value = mailText,
-                    onValueChange = { texto ->
-                        mailText = texto
-                    },
-                    label = {
-                        Text("E-Mail")
-                    },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+
+                TextField(
+                    value = telefono,
+                    onValueChange = { telefono = it },
+                    label = { Text("Teléfono") },
+                    singleLine = true,
+                    keyboardOptions = androidx.compose.foundation.text.KeyboardOptions(
+                        keyboardType = androidx.compose.ui.text.input.KeyboardType.Number
+                    ),
+                    modifier = Modifier.fillMaxWidth()
                 )
-                Spacer(modifier = Modifier.padding(8.dp))
-                OutlinedTextField(
-                    value = telefonoText,
-                    onValueChange = { texto ->
-                        telefonoText = texto
-                    },
-                    label = {
-                        Text("Telefono")
-                    },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone)
-                )
-                Spacer(modifier = Modifier.padding(8.dp))
+
+                Spacer(modifier = Modifier.padding(16.dp))
+
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.End
                 ) {
-                    TextButton(
-                        onClick = onDismiss
-                    ) {
+                    TextButton(onClick = onDismiss) {
                         Text("Cancelar")
                     }
-                    TextButton(
+                    Button(
                         onClick = {
-                            if (nombreText.isNotBlank() && apellidoText.isNotBlank() && mailText.isNotBlank() && telefonoText.isNotBlank()) {
-                                onConfirm(
-                                    Contacto(
-                                        nombre = nombreText,
-                                        apellido = apellidoText,
-                                        mail = mailText,
-                                        telefono = BigInteger(telefonoText)
-                                    )
-                                )
+                            if (nombre.isNotBlank() && telefono.isNotBlank()) {
+                                onConfirm(nombre, telefono)
                             }
-                        }
+                        },
+                        enabled = nombre.isNotBlank() && telefono.isNotBlank()
                     ) {
-                        Text("Crear")
+                        Text("Añadir")
                     }
                 }
             }
         }
     }
-
 }
