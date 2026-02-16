@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Call
 import androidx.compose.material.icons.filled.Email
@@ -114,9 +113,9 @@ fun ContactoDetailView(
                 )
             ) {
                 Column(modifier = Modifier.padding(16.dp)) {
-                    InfoRow(label = "Teléfono", value = contacto.telefono, icon = Icons.Default.Phone)
+                    InfoRow2(label = "Teléfono", value = contacto.telefono, icon = Icons.Default.Phone)
                     HorizontalDivider(modifier = Modifier.padding(vertical = 12.dp))
-                    InfoRow(label = "Correo electrónico", value = contacto.mail, icon = Icons.Default.Email)
+                    InfoRow2(label = "Correo electrónico", value = contacto.mail, icon = Icons.Default.Email)
                 }
             }
         }
@@ -134,7 +133,7 @@ fun QuickActionItem(icon: ImageVector, label: String) {
 }
 
 @Composable
-fun InfoRow(label: String, value: String, icon: ImageVector) {
+fun InfoRow2(label: String, value: String, icon: ImageVector) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Icon(
             imageVector = icon,

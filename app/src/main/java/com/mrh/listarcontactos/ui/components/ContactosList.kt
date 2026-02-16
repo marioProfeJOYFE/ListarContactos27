@@ -1,5 +1,6 @@
 package com.mrh.listarcontactos.ui.components
 
+import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -21,12 +22,14 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
@@ -43,6 +46,14 @@ fun MainView(modifier: Modifier = Modifier, navController: NavController? = null
             Contacto("Juan", "Pepe", "juan@mail.com", BigInteger("600000000"))
         )
     }
+
+    val context = LocalContext.current
+
+    val sharedPreferences = remember {
+        context.getSharedPreferences("misAjustes", Context.MODE_PRIVATE)
+    }
+
+    var numeroContactosGuardado by remember { mutableIntStateOf(sharedPreferences.getInt("numeroContactos",0)) }
 
     var showDialog by remember { mutableStateOf(false) }
 
@@ -66,6 +77,7 @@ fun MainView(modifier: Modifier = Modifier, navController: NavController? = null
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             ContactosList(contactos = contactos, navController = navController)
+            Text(text = "Numero de contactos: $numeroContactosGuardado")
         }
 
         if (showDialog) {
@@ -81,6 +93,11 @@ fun MainView(modifier: Modifier = Modifier, navController: NavController? = null
                         imagenId = null // Por defecto sin foto
                     )
                     contactos.add(nuevoContacto)
+                    //Guardamos un Int en las SharedPreferences
+                    sharedPreferences.edit()
+                        .putInt("numeroContactos",contactos.size)
+                        .apply()
+                    numeroContactosGuardado = sharedPreferences.getInt("numeroContactos",0)
                     showDialog = false // Cerrar tras añadir
                 }
             )
